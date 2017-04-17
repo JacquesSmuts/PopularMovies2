@@ -7,3 +7,10 @@
 /build
 /captures
 .externalNativeBuild
+/gradle.properties
+.idea/modules.xml
+.idea/runConfigurations.xml
+.idea/vcs.xml
+app/libs/
+app/src/main/java/com/jacquessmuts/popularmovies/Activities/
+app/src/main/res/drawable/

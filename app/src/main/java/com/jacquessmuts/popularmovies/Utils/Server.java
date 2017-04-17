@@ -1,5 +1,7 @@
 package com.jacquessmuts.popularmovies.Utils;
 
+import com.jacquessmuts.popularmovies.BuildConfig;
+
 /**
  * Created by Jacques Smuts on 2017/04/17.
  *
@@ -14,6 +16,7 @@ public class Server {
 
     public static final String BASE_URL = "http://tmdb.org";
     public static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    public static final String API_KEY = BuildConfig.API_KEY; //Replace API Key here, or define in gradle.properties
 
     public enum ImageSize {
         ONE("w92"),
