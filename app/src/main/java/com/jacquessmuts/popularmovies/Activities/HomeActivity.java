@@ -3,28 +3,60 @@ package com.jacquessmuts.popularmovies.Activities;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
 
-public class HomeActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
+
+    private RecyclerView mRecyclerView;
+    private MovieListAdapter mMovieListAdapter;
+
+    private TextView mErrorMessageDisplay;
+    private ProgressBar mLoadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Server.getPopularMovies(new PopularMoviesListener());
+        findViews();
         setupRecyclerView();
+        getData();
+    }
+
+    private void findViews(){
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_home);
+        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
     }
 
     private void setupRecyclerView(){
-        //TODO do that whole recyclerview setup thing throughout
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mMovieListAdapter = new MovieListAdapter(this);
+        mRecyclerView.setAdapter(mMovieListAdapter);
+    }
+
+    private void getData(){
+        Server.getPopularMovies(new PopularMoviesListener());
     }
 
     @Override
     public void onRefresh() {
         //TODO: when the user refreshes through pull-to-refresh, or after data gets successfully loaded
+    }
+
+    @Override
+    public void onClick(String weatherForDay) {
+
     }
 
     public class PopularMoviesListener implements Server.ServerListener{
