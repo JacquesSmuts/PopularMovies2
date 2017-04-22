@@ -10,13 +10,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
+import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
+
+import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerView;
     private MovieListAdapter mMovieListAdapter;
+    private ArrayList<Movie> mMovies;
 
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
@@ -27,7 +31,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         setContentView(R.layout.activity_home);
         findViews();
         setupRecyclerView();
-        getData();
+        onRefresh();
     }
 
     private void findViews(){
@@ -45,13 +49,9 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         mRecyclerView.setAdapter(mMovieListAdapter);
     }
 
-    private void getData(){
-        Server.getPopularMovies(new PopularMoviesListener());
-    }
-
     @Override
     public void onRefresh() {
-        //TODO: when the user refreshes through pull-to-refresh, or after data gets successfully loaded
+        Server.getPopularMovies(new PopularMoviesListener());
     }
 
     @Override
@@ -64,7 +64,11 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         @Override
         public void serverResponse(String response) {
             Log.d("Server Response", response);
-            //TODO Handle ServerResponse here. Use Gson.
+            ArrayList<Movie> movies = new ArrayList<>();
+
+            mMovies = Movie.listFromJson(response);
+
+            onRefresh();
         }
     }
 }

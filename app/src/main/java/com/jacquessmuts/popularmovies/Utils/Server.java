@@ -38,6 +38,8 @@ public class Server {
     private static final String API_KEY = BuildConfig.API_KEY; //Replace API Key here, or define in gradle.properties
     private static final String API_KEY_APPEND ="?api_key=" + API_KEY;
 
+    public static final String JSON_RESULTS = "results";
+
     private static OkHttpClient mClient = new OkHttpClient();
 
     public interface ServerListener{
