@@ -8,9 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * Created by Jacques Smuts on 2017/04/20.
@@ -18,12 +21,12 @@ import com.squareup.picasso.Picasso;
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieListViewHolder> {
 
-    private String[] mMovieList;
+    private ArrayList<Movie> mMovieList;
 
     private final MovieListOnClickHandler mClickHandler;
 
     public interface MovieListOnClickHandler {
-        void onClick(String movieObject);
+        void onClick(Movie movieObject);
     }
 
 
@@ -43,8 +46,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
 
         @Override
         public void onClick(View v) {
-            int adapterPosition = getAdapterPosition();
-            String movie = mMovieList[adapterPosition];
+            Movie movie = mMovieList.get(getAdapterPosition());
             mClickHandler.onClick(movie);
         }
     }
@@ -68,24 +70,23 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
      */
     @Override
     public void onBindViewHolder(MovieListViewHolder movieListViewHolder, int position) {
-        String movieItem = mMovieList[position];
+        Movie movieItem = mMovieList.get(position);
 
-        //todo: enable picasso once I actually have a movie object with image url to build
-//        Context context = movieListViewHolder.mImageMoviePoster.getContext();
-//        Picasso.with(context)
-//                .load(Server.buildImageUrl(context, movieItem))
-//                .into(movieListViewHolder.mImageMoviePoster);
-        movieListViewHolder.mImageMoviePoster.setImageResource(android.R.drawable.alert_dark_frame); //temp
+        Context context = movieListViewHolder.mImageMoviePoster.getContext();
+        Picasso.with(context)
+                .load(Server.buildImageUrl(context, movieItem.getPoster_path()))
+                .placeholder(android.R.drawable.ic_menu_upload)
+                .into(movieListViewHolder.mImageMoviePoster);
     }
 
 
     @Override
     public int getItemCount() {
         if (null == mMovieList) return 0;
-        return mMovieList.length;
+        return mMovieList.size();
     }
 
-    public void setData(String[] movieList) {
+    public void setData(ArrayList<Movie> movieList) {
         mMovieList = movieList;
         notifyDataSetChanged();
     }

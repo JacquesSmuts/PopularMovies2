@@ -154,8 +154,13 @@ public class Movie implements Parcelable {
     public static ArrayList<Movie> listFromJson(String jsonString){
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
-        Type listType = new TypeToken<ArrayList<Movie>>(){}.getType();
-        ArrayList<Movie> movies = gson.fromJson(jsonObject.get(Server.JSON_RESULTS), listType);
+        Type listType = new TypeToken<List<Movie>>(){}.getType();
+        ArrayList<Movie> movies = null;
+        try {
+            movies = gson.fromJson(jsonObject.get(Server.JSON_RESULTS), listType);
+        } catch (IllegalStateException e){
+            e.printStackTrace(); // probably not necessary?
+        }
         return movies;
     }
 

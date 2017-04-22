@@ -3,6 +3,7 @@ package com.jacquessmuts.popularmovies.Activities;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,7 +21,6 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     private RecyclerView mRecyclerView;
     private MovieListAdapter mMovieListAdapter;
-    private ArrayList<Movie> mMovies;
 
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
@@ -41,12 +41,23 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void setupRecyclerView(){
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager
+                = new GridLayoutManager(this, 3);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mMovieListAdapter = new MovieListAdapter(this);
         mRecyclerView.setAdapter(mMovieListAdapter);
+    }
+
+    public void handleServerResponse(final String response){
+        //runOnUiThread needs to be done because the adapter's notifydatasetchanged only works on UI thread
+        HomeActivity.this.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                mMovieListAdapter.setData(Movie.listFromJson(response));
+            }
+        });
     }
 
     @Override
@@ -55,20 +66,15 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     @Override
-    public void onClick(String weatherForDay) {
-
+    public void onClick(Movie movieObject) {
+        //TODO: open a DetailedMovieActivity with the given movieObject.
     }
 
     public class PopularMoviesListener implements Server.ServerListener{
 
         @Override
         public void serverResponse(String response) {
-            Log.d("Server Response", response);
-            ArrayList<Movie> movies = new ArrayList<>();
-
-            mMovies = Movie.listFromJson(response);
-
-            onRefresh();
+            handleServerResponse(response);
         }
     }
 }
