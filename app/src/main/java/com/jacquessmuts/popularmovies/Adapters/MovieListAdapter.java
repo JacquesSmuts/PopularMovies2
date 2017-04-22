@@ -90,4 +90,9 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         mMovieList = movieList;
         notifyDataSetChanged();
     }
+
+    public void addData(ArrayList<Movie> movieList){
+        mMovieList.addAll(movieList);
+        notifyDataSetChanged();
+    }
 }

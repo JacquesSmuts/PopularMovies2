@@ -14,11 +14,6 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
-    //original title
-//    movie poster image thumbnail
-//    A plot synopsis (called overview in the api)
-//    user rating (called vote_average in the api)
-//    release date
     public static final String EXTRA_MOVIE = "extra_movie";
 
     private Movie mMovie;
@@ -36,10 +31,17 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handleExtras();
         setContentView(R.layout.activity_movie_detail);
+        handleExtras();
         findViews();
         populateContents();
+    }
+
+    private void handleExtras(){
+        Bundle extras = getIntent().getExtras();
+        if (extras.containsKey(EXTRA_MOVIE)){
+            mMovie = extras.getParcelable(EXTRA_MOVIE);
+        }
     }
 
     private void findViews(){
@@ -51,6 +53,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void populateContents(){
+        if (mMovie == null){
+            finish();
+            return;
+        }
         Picasso.with(this)
                 .load(Server.buildImageUrl(this, mMovie.getPoster_path()))
                 .into(mImageViewPoster);
@@ -61,10 +67,4 @@ public class MovieDetailActivity extends AppCompatActivity {
         mTextViewSynopsis.setText(mMovie.getOverview());
     }
 
-    private void handleExtras(){
-        Bundle extras = getIntent().getExtras();
-        if (extras.containsKey(EXTRA_MOVIE)){
-            mMovie = extras.getParcelable(EXTRA_MOVIE);
-        }
-    }
 }

@@ -34,6 +34,8 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         onRefresh();
     }
 
+    //todo: add OnCreateOptions to use menu to change sort order
+
     private void findViews(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_home);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
@@ -43,6 +45,8 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     private void setupRecyclerView(){
         GridLayoutManager layoutManager
                 = new GridLayoutManager(this, 3);
+        //todo: implement swiperefreshLayout
+        //todo: implement scrollListener with paging API calls
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mMovieListAdapter = new MovieListAdapter(this);
