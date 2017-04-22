@@ -67,7 +67,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     @Override
     public void onClick(Movie movieObject) {
-        //TODO: open a DetailedMovieActivity with the given movieObject.
+        startActivity(MovieDetailActivity.getIntent(this, movieObject));
     }
 
     public class PopularMoviesListener implements Server.ServerListener{
