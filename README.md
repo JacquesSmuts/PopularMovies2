@@ -12,5 +12,8 @@ The API key will need to be replaced in the app, by defining it in the (currentl
  
 Get an API key here:
 https://www.themoviedb.org/account/signup
- 
+
+and API examples here:
+https://developers.themoviedb.org/3/movies/get-popular-movies
+
  "This product uses the TMDb API but is not endorsed or certified by TMDb." https://www.themoviedb.org/about/logos-attribution
