@@ -37,6 +37,7 @@ public class Server {
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String API_KEY = BuildConfig.API_KEY; //Replace API Key here, or define in gradle.properties
     private static final String API_KEY_APPEND ="?api_key=" + API_KEY;
+    private static final String PAGE_NUMBER = "&page=";
 
     public static final String JSON_RESULTS = "results";
 
@@ -86,24 +87,28 @@ public class Server {
     }
 
     public static void getMovies(SortingOption option, ServerListener listener){
+        getMovies(option, 1, listener);
+    }
+
+    public static void getMovies(SortingOption option, int pageNumber, ServerListener listener){
 
         switch (option){
             case POPULAR:
-                getPopularMovies(listener);
+                getPopularMovies(pageNumber, listener);
                 break;
             case RATING:
-                getTopRatedMovies(listener);
+                getTopRatedMovies(pageNumber, listener);
                 break;
         }
     }
 
 
-    public static void getTopRatedMovies(ServerListener listener){
-        doRequest(TOP_RATED, listener);
+    public static void getTopRatedMovies(int pageNumber, ServerListener listener){
+        doRequest(TOP_RATED, pageNumber, listener);
     }
 
-    public static void getPopularMovies(ServerListener listener){
-        doRequest(POPULAR, listener);
+    public static void getPopularMovies(int pageNumber, ServerListener listener){
+        doRequest(POPULAR, pageNumber, listener);
     }
 
     /**
@@ -111,10 +116,14 @@ public class Server {
      * @param url url from statics declared above
      * @param listener listener must be implemented in returning class
      */
-    private static void doRequest(String url, final ServerListener listener) {
+    private static void doRequest(String url, int pageNumber, final ServerListener listener) {
         Log.i(TAG, "url=" + url);
+        String finalUrl = url+API_KEY_APPEND;
+        if (pageNumber > 1){
+            finalUrl += PAGE_NUMBER + pageNumber;
+        }
         Request request = new Request.Builder()
-                .url(url+API_KEY_APPEND)
+                .url(finalUrl)
                 .build();
 
         mClient.newCall(request).enqueue(new Callback() {

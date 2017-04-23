@@ -6,25 +6,33 @@ android:layout_width="match_parent"
 android:layout_height="match_parent"
 tools:context="com.jacquessmuts.popularmovies.Activities.HomeActivity">
 
-<android.support.v7.widget.RecyclerView
-    android:id="@+id/recyclerview_home"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swiperefresh_home"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-<TextView
-    android:id="@+id/tv_error_message_display"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="16dp"
-    android:text="@string/error_message"
-    android:textSize="20sp"
-    android:visibility="invisible" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
-<ProgressBar
-    android:id="@+id/pb_loading_indicator"
-    android:layout_height="42dp"
-    android:layout_width="42dp"
-    android:layout_gravity="center"
-    android:visibility="invisible" />
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+
+    <TextView
+        android:id="@+id/tv_error_message_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/error_message"
+        android:textSize="20sp"
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/pb_loading_indicator"
+        android:layout_height="42dp"
+        android:layout_width="42dp"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
 
 </FrameLayout>

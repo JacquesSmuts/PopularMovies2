@@ -1,5 +1,6 @@
 package com.jacquessmuts.popularmovies.Activities;
 
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,10 +23,12 @@ import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
+    private SwipeRefreshLayout mSwipeRefresh;
     private RecyclerView mRecyclerView;
+    private GridLayoutManager mLayoutManager;
     private MovieListAdapter mMovieListAdapter;
+    private ScrollPagingListener mScrollListener;
 
-    //TODO: handle empty state
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
 
@@ -44,21 +47,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     @Override
     public void onRefresh() {
         setLoading(true);
-        if (Util.getConnected(this)) {
-            Server.getMovies(mSortingOption, new GetMoviesListener());
-        } else {
-            handleServerSuccess(false);
-        }
-    }
-
-    private void setLoading(boolean isLoading){
-        if (isLoading){
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-            mRecyclerView.setVisibility(View.GONE);
-        } else {
-            mLoadingIndicator.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
-        }
+        getData(1);
     }
 
     @Override
@@ -90,20 +79,47 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void findViews(){
+        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swiperefresh_home);
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_home);
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
     }
 
     private void setupRecyclerView(){
-        GridLayoutManager layoutManager
-                = new GridLayoutManager(this, 3);
-        //todo: implement swiperefreshLayout?
-        //todo: implement scrollListener with paging API calls?
-        mRecyclerView.setLayoutManager(layoutManager);
+        mLayoutManager = new GridLayoutManager(this, 3);
+        mSwipeRefresh.setOnRefreshListener(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
         mMovieListAdapter = new MovieListAdapter(this);
         mRecyclerView.setAdapter(mMovieListAdapter);
+
+        mScrollListener = new ScrollPagingListener(mLayoutManager);
+        mRecyclerView.addOnScrollListener(mScrollListener);
+    }
+
+    private void getData(int pageNumber){
+        if (pageNumber > 1) {
+            mSwipeRefresh.setRefreshing(true);
+        } else {
+            mRecyclerView.removeOnScrollListener(mScrollListener);
+            mScrollListener = new ScrollPagingListener(mLayoutManager);
+            mRecyclerView.addOnScrollListener(mScrollListener);
+        }
+        if (Util.getConnected(this)) {
+            Server.getMovies(mSortingOption, pageNumber, new GetMoviesListener());
+        } else {
+            handleServerSuccess(false);
+        }
+    }
+
+    private void setLoading(boolean isLoading){
+        if (isLoading){
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        } else {
+            mLoadingIndicator.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void handleServerResponse(final String response){
@@ -116,7 +132,12 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
                 final ArrayList<Movie> movies = Movie.listFromJson(response);
                 setLoading(false);
                 handleServerSuccess(movies != null && movies.size() > 0);
-                mMovieListAdapter.setData(movies);
+                if (mSwipeRefresh.isRefreshing()){
+                    mMovieListAdapter.addData(movies);
+                    mSwipeRefresh.setRefreshing(false);
+                } else {
+                    mMovieListAdapter.setData(movies);
+                }
             }
         });
 
@@ -135,6 +156,53 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         @Override
         public void serverResponse(String response) {
             handleServerResponse(response);
+        }
+    }
+
+    private class ScrollPagingListener extends RecyclerView.OnScrollListener {
+
+        private int previousTotal = 0; // The total number of items in the dataset after the last load
+        private boolean loading = true; // True if we are still waiting for the last set of data to load.
+        private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
+        int firstVisibleItem, visibleItemCount, totalItemCount;
+
+        private int current_page = 1;
+
+        private GridLayoutManager mLayoutManager;
+
+        public ScrollPagingListener(GridLayoutManager linearLayoutManager) {
+            this.mLayoutManager = linearLayoutManager;
+        }
+
+        public void reset(){
+            previousTotal = 0;
+            loading = false;
+            current_page = 1;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            visibleItemCount = recyclerView.getChildCount();
+            totalItemCount = mLayoutManager.getItemCount();
+            firstVisibleItem = mLayoutManager.findFirstVisibleItemPosition();
+
+            if (loading) {
+                if (totalItemCount > previousTotal) {
+                    loading = false;
+                    previousTotal = totalItemCount;
+                }
+            }
+            if (!loading && (totalItemCount - visibleItemCount)
+                    <= (firstVisibleItem + visibleThreshold)) {
+                // End has been reached
+                current_page++;
+
+                getData(current_page);
+
+                loading = true;
+            }
         }
     }
 }
