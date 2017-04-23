@@ -46,6 +46,10 @@ public class Server {
         void serverResponse(String response);
     }
 
+    public enum SortingOption{
+        POPULAR, RATING
+    }
+
     private enum ImageSize {
         ONE("w92"),
         TWO("w154"),
@@ -81,25 +85,26 @@ public class Server {
         return url;
     }
 
+    public static void getMovies(SortingOption option, ServerListener listener){
+
+        switch (option){
+            case POPULAR:
+                getPopularMovies(listener);
+                break;
+            case RATING:
+                getTopRatedMovies(listener);
+                break;
+        }
+    }
+
+
+    public static void getTopRatedMovies(ServerListener listener){
+        doRequest(TOP_RATED, listener);
+    }
+
     public static void getPopularMovies(ServerListener listener){
         doRequest(POPULAR, listener);
     }
-
-//    private static void doRequest(String url, ServerListener listener){
-//        try {
-//            Request request = new Request.Builder()
-//                    .url(url)
-//                    .build();
-//
-//            Log.i(TAG, "url="+url);
-//            Response response = mClient.newCall(request).execute();
-//            String responseString = response.body().string();
-//            Log.i(TAG, "response="+responseString);
-//            listener.serverResponse(responseString);
-//        } catch (IOException e){
-//            Log.e(TAG, e.toString());
-//        }
-//    }
 
     /**
      * Asynchronously do a getRequest with the given URL, and return a string through the given listener

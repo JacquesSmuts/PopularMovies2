@@ -4,9 +4,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,15 +16,16 @@ import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
 
-import java.util.ArrayList;
-
 public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
     private RecyclerView mRecyclerView;
     private MovieListAdapter mMovieListAdapter;
 
+    //TODO: handle empty state
     private TextView mErrorMessageDisplay;
     private ProgressBar mLoadingIndicator;
+
+    private Server.SortingOption mSortingOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +33,33 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         setContentView(R.layout.activity_home);
         findViews();
         setupRecyclerView();
+        mSortingOption = Server.SortingOption.POPULAR;
         onRefresh();
     }
 
-    //todo: add OnCreateOptions to use menu to change sort order
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_sort_popular:
+                mSortingOption = Server.SortingOption.POPULAR;
+                onRefresh();
+                return true;
+            case R.id.menu_sort_rating:
+                mSortingOption = Server.SortingOption.RATING;
+                onRefresh();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private void findViews(){
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_home);
@@ -66,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     @Override
     public void onRefresh() {
-        Server.getPopularMovies(new PopularMoviesListener());
+        Server.getMovies(mSortingOption, new GetMoviesListener());
     }
 
     @Override
@@ -74,7 +99,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         startActivity(MovieDetailActivity.getIntent(this, movieObject));
     }
 
-    public class PopularMoviesListener implements Server.ServerListener{
+    private class GetMoviesListener implements Server.ServerListener{
 
         @Override
         public void serverResponse(String response) {
