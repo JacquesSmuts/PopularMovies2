@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,6 +16,8 @@ import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
 import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
+
+import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
@@ -37,6 +40,17 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         onRefresh();
     }
 
+    @Override
+    public void onRefresh() {
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+        //TODO: check network state either here or inside Server?
+        Server.getMovies(mSortingOption, new GetMoviesListener());
+    }
+
+    @Override
+    public void onClick(Movie movieObject) {
+        startActivity(MovieDetailActivity.getIntent(this, movieObject));
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -79,24 +93,27 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     public void handleServerResponse(final String response){
+
         //runOnUiThread needs to be done because the adapter's notifydatasetchanged only works on UI thread
         HomeActivity.this.runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-                mMovieListAdapter.setData(Movie.listFromJson(response));
+                final ArrayList<Movie> movies = Movie.listFromJson(response);
+                handleServerSuccess(movies != null && movies.size() > 0);
+                mLoadingIndicator.setVisibility(View.GONE);
+                mMovieListAdapter.setData(movies);
             }
         });
+
     }
 
-    @Override
-    public void onRefresh() {
-        Server.getMovies(mSortingOption, new GetMoviesListener());
-    }
-
-    @Override
-    public void onClick(Movie movieObject) {
-        startActivity(MovieDetailActivity.getIntent(this, movieObject));
+    private void handleServerSuccess(boolean success){
+        if (success){
+            mErrorMessageDisplay.setVisibility(View.GONE);
+        } else {
+            mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        }
     }
 
     private class GetMoviesListener implements Server.ServerListener{
