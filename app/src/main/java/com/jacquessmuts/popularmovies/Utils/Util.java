@@ -1,6 +1,8 @@
 package com.jacquessmuts.popularmovies.Utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 
 /**
@@ -14,4 +16,13 @@ public class Util {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return (int)(metrics.density * 160f);
     }
+
+    public static boolean getConnected(Context context){
+        ConnectivityManager cm =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
 }

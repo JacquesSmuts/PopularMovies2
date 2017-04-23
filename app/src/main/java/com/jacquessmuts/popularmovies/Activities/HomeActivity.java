@@ -16,6 +16,7 @@ import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
 import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
+import com.jacquessmuts.popularmovies.Utils.Util;
 
 import java.util.ArrayList;
 
@@ -42,9 +43,22 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     @Override
     public void onRefresh() {
-        mLoadingIndicator.setVisibility(View.VISIBLE);
-        //TODO: check network state either here or inside Server?
-        Server.getMovies(mSortingOption, new GetMoviesListener());
+        setLoading(true);
+        if (Util.getConnected(this)) {
+            Server.getMovies(mSortingOption, new GetMoviesListener());
+        } else {
+            handleServerSuccess(false);
+        }
+    }
+
+    private void setLoading(boolean isLoading){
+        if (isLoading){
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        } else {
+            mLoadingIndicator.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -84,8 +98,8 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     private void setupRecyclerView(){
         GridLayoutManager layoutManager
                 = new GridLayoutManager(this, 3);
-        //todo: implement swiperefreshLayout
-        //todo: implement scrollListener with paging API calls
+        //todo: implement swiperefreshLayout?
+        //todo: implement scrollListener with paging API calls?
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mMovieListAdapter = new MovieListAdapter(this);
@@ -100,8 +114,8 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
             @Override
             public void run() {
                 final ArrayList<Movie> movies = Movie.listFromJson(response);
+                setLoading(false);
                 handleServerSuccess(movies != null && movies.size() > 0);
-                mLoadingIndicator.setVisibility(View.GONE);
                 mMovieListAdapter.setData(movies);
             }
         });

@@ -3,4 +3,6 @@
     <string name="error_message">Something went wrong. Please check your internet connection and try again.</string>
     <string name="sort_top">Sort by rating</string>
     <string name="sort_popular">Sort by popularity</string>
+    <string name="user_rating">User Rating:</string>
+    <string name="release_date">Release Date:</string>
 </resources>
