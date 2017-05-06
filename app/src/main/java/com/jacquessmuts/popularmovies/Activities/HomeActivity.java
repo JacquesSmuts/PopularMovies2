@@ -1,6 +1,6 @@
 package com.jacquessmuts.popularmovies.Activities;
 
-import android.support.v4.widget.NestedScrollView;
+import android.content.res.Configuration;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,16 +21,19 @@ import com.jacquessmuts.popularmovies.Utils.Util;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
-    private SwipeRefreshLayout mSwipeRefresh;
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.swiperefresh_home) SwipeRefreshLayout swiperefresh_home;
+    @BindView(R.id.recyclerview_home) RecyclerView recyclerview_home;
     private GridLayoutManager mLayoutManager;
     private MovieListAdapter mMovieListAdapter;
     private ScrollPagingListener mScrollListener;
 
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
+    @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
+    @BindView(R.id.pb_loading_indicator) ProgressBar pb_loading_indicator;
 
     private Server.SortingOption mSortingOption;
 
@@ -38,7 +41,7 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        findViews();
+        ButterKnife.bind(this);
         setupRecyclerView();
         mSortingOption = Server.SortingOption.POPULAR;
         onRefresh();
@@ -78,32 +81,30 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         }
     }
 
-    private void findViews(){
-        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swiperefresh_home);
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_home);
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-    }
-
     private void setupRecyclerView(){
-        mLayoutManager = new GridLayoutManager(this, 3);
-        mSwipeRefresh.setOnRefreshListener(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mLayoutManager = new GridLayoutManager(this, 3);
+        } else{
+            mLayoutManager = new GridLayoutManager(this, 5);
+        }
+        swiperefresh_home.setOnRefreshListener(this);
+        recyclerview_home.setLayoutManager(mLayoutManager);
+        recyclerview_home.setHasFixedSize(true);
+
         mMovieListAdapter = new MovieListAdapter(this);
-        mRecyclerView.setAdapter(mMovieListAdapter);
+        recyclerview_home.setAdapter(mMovieListAdapter);
 
         mScrollListener = new ScrollPagingListener(mLayoutManager);
-        mRecyclerView.addOnScrollListener(mScrollListener);
+        recyclerview_home.addOnScrollListener(mScrollListener);
     }
 
     private void getData(int pageNumber){
         if (pageNumber > 1) {
-            mSwipeRefresh.setRefreshing(true);
+            swiperefresh_home.setRefreshing(true);
         } else {
-            mRecyclerView.removeOnScrollListener(mScrollListener);
+            recyclerview_home.removeOnScrollListener(mScrollListener);
             mScrollListener = new ScrollPagingListener(mLayoutManager);
-            mRecyclerView.addOnScrollListener(mScrollListener);
+            recyclerview_home.addOnScrollListener(mScrollListener);
         }
         if (Util.getConnected(this)) {
             Server.getMovies(mSortingOption, pageNumber, new GetMoviesListener());
@@ -114,11 +115,11 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     private void setLoading(boolean isLoading){
         if (isLoading){
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-            mRecyclerView.setVisibility(View.GONE);
+            pb_loading_indicator.setVisibility(View.VISIBLE);
+            recyclerview_home.setVisibility(View.GONE);
         } else {
-            mLoadingIndicator.setVisibility(View.GONE);
-            mRecyclerView.setVisibility(View.VISIBLE);
+            pb_loading_indicator.setVisibility(View.GONE);
+            recyclerview_home.setVisibility(View.VISIBLE);
         }
     }
 
@@ -132,9 +133,9 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
                 final ArrayList<Movie> movies = Movie.listFromJson(response);
                 setLoading(false);
                 handleServerSuccess(movies != null && movies.size() > 0);
-                if (mSwipeRefresh.isRefreshing()){
+                if (swiperefresh_home.isRefreshing()){
                     mMovieListAdapter.addData(movies);
-                    mSwipeRefresh.setRefreshing(false);
+                    swiperefresh_home.setRefreshing(false);
                 } else {
                     mMovieListAdapter.setData(movies);
                 }
@@ -145,9 +146,9 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
 
     private void handleServerSuccess(boolean success){
         if (success){
-            mErrorMessageDisplay.setVisibility(View.GONE);
+            tv_error_message_display.setVisibility(View.GONE);
         } else {
-            mErrorMessageDisplay.setVisibility(View.VISIBLE);
+            tv_error_message_display.setVisibility(View.VISIBLE);
         }
     }
 

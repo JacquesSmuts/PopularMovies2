@@ -12,14 +12,19 @@ import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE = "extra_movie";
 
     private Movie mMovie;
-
-    private TextView mTextViewTitle, mTextViewRating, mTextViewDate, mTextViewSynopsis;
-    private ImageView mImageViewPoster;
+    @BindView(R.id.textview_title) TextView textview_title;
+    @BindView(R.id.textview_rating) TextView textview_rating;
+    @BindView(R.id.textview_date) TextView textview_date;
+    @BindView(R.id.textview_synopsis) TextView textview_synopsis;
+    @BindView(R.id.imageview_poster) ImageView imageview_poster;
 
     public static Intent getIntent(Context context, Movie movie){
         Intent intent = new Intent(context, MovieDetailActivity.class);
@@ -32,8 +37,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+        ButterKnife.bind(this);
         handleExtras();
-        findViews();
         populateContents();
     }
 
@@ -44,14 +49,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void findViews(){
-        mImageViewPoster = (ImageView) findViewById(R.id.imageview_poster);
-        mTextViewTitle = (TextView) findViewById(R.id.textview_title);
-        mTextViewRating = (TextView) findViewById(R.id.textview_rating);
-        mTextViewDate = (TextView) findViewById(R.id.textview_date);
-        mTextViewSynopsis = (TextView) findViewById(R.id.textview_synopsis);
-    }
-
     private void populateContents(){
         if (mMovie == null){
             finish();
@@ -59,12 +56,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
         Picasso.with(this)
                 .load(Server.buildImageUrl(this, mMovie.getPoster_path()))
-                .into(mImageViewPoster);
+                .into(imageview_poster);
 
-        mTextViewTitle.setText(mMovie.getOriginal_title());
-        mTextViewRating.setText(String.valueOf(mMovie.getVote_average()));
-        mTextViewDate.setText(mMovie.getRelease_date());
-        mTextViewSynopsis.setText(mMovie.getOverview());
+        textview_title.setText(mMovie.getOriginal_title());
+        textview_rating.setText(String.valueOf(mMovie.getVote_average()));
+        textview_date.setText(mMovie.getRelease_date());
+        textview_synopsis.setText(mMovie.getOverview());
     }
 
 }
