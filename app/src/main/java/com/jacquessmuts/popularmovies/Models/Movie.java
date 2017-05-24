@@ -1,4 +1,4 @@
-package com.jacquessmuts.popularmovies;
+package com.jacquessmuts.popularmovies.Models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,8 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.jacquessmuts.popularmovies.Utils.Server;
-
-import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -30,6 +28,8 @@ public class Movie implements Parcelable {
     private int id;
     private boolean adult;
     private int vote_count;
+    private ArrayList<Trailer> trailers;
+    private ArrayList<Review> reviews;
 
     //GETTERS AND SETTERS
     public String getOverview() {
@@ -144,6 +144,22 @@ public class Movie implements Parcelable {
         this.vote_count = vote_count;
     }
 
+    public ArrayList<Trailer> getTrailers() {
+        return trailers;
+    }
+
+    public void setTrailers(ArrayList<Trailer> trailers) {
+        this.trailers = trailers;
+    }
+
+    public ArrayList<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(ArrayList<Review> reviews) {
+        this.reviews = reviews;
+    }
+
     //JSON handler
 
     /**
@@ -187,12 +203,14 @@ public class Movie implements Parcelable {
         dest.writeInt(this.id);
         dest.writeByte(this.adult ? (byte) 1 : (byte) 0);
         dest.writeInt(this.vote_count);
+        dest.writeTypedList(this.trailers);
+        dest.writeTypedList(this.reviews);
     }
 
     public Movie() {
     }
 
-    protected Movie(Parcel in) {
+    private Movie(Parcel in) {
         this.overview = in.readString();
         this.original_language = in.readString();
         this.original_title = in.readString();
@@ -207,6 +225,8 @@ public class Movie implements Parcelable {
         this.id = in.readInt();
         this.adult = in.readByte() != 0;
         this.vote_count = in.readInt();
+        this.trailers = in.createTypedArrayList(Trailer.CREATOR);
+        this.reviews = in.createTypedArrayList(Review.CREATOR);
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

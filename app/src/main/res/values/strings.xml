@@ -5,4 +5,5 @@
     <string name="sort_popular">Sort by popularity</string>
     <string name="user_rating">User Rating:</string>
     <string name="release_date">Release Date:</string>
+    <string name="poster_content_description">Poster of the movie</string>
 </resources>

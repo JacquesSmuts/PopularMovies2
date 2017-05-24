@@ -6,9 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.jacquessmuts.popularmovies.Movie;
+import com.jacquessmuts.popularmovies.Models.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
 import com.squareup.picasso.Picasso;
@@ -36,7 +35,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
 
     public class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public final ImageView mImageMoviePoster;
+        private final ImageView mImageMoviePoster;
 
         public MovieListViewHolder(View view) {
             super(view);
