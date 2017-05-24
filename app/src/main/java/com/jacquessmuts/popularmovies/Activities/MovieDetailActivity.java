@@ -10,7 +10,10 @@ import android.widget.TextView;
 import com.jacquessmuts.popularmovies.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
+import com.jacquessmuts.popularmovies.Utils.Util;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -40,6 +43,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         handleExtras();
         populateContents();
+        //downloadAdditionalData();
     }
 
     private void handleExtras(){
@@ -63,5 +67,43 @@ public class MovieDetailActivity extends AppCompatActivity {
         textview_date.setText(mMovie.getRelease_date());
         textview_synopsis.setText(mMovie.getOverview());
     }
+
+//    private void downloadAdditionalData(){
+//        if (Util.getConnected(this)) {
+//            Server.getTrailers(mMovie.getId(), new GetTrailersListener());
+//            Server.getReviews(mMovie.getId(), new GetMoviesListener());
+//        } else {
+//            handleServerSuccess(false);
+//        }
+//    }
+//
+//    private class GetTrailersListener implements Server.ServerListener{
+//
+//        @Override
+//        public void serverResponse(String response) {
+//            handleServerResponse(response);
+//        }
+//    }
+//
+//
+//    public void handleTrailerResponse(final String response){
+//
+//        //runOnUiThread needs to be done because the adapter's notifydatasetchanged only works on UI thread
+//        MovieDetailActivity.this.runOnUiThread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                final ArrayList<Trailer> trailers = Trailer.listFromJson(response);
+//                handleServerSuccess(movies != null && movies.size() > 0);
+//                if (swiperefresh_home.isRefreshing()){
+//                    mMovieListAdapter.addData(movies);
+//                    swiperefresh_home.setRefreshing(false);
+//                } else {
+//                    mMovieListAdapter.setData(movies);
+//                }
+//            }
+//        });
+//
+//    }
 
 }

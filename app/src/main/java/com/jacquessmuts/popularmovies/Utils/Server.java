@@ -33,6 +33,9 @@ public class Server {
 
     private static final String BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String POPULAR = BASE_URL + "popular";
+    private static final String TRAILERS = BASE_URL + "%s/videos";
+    private static final String REVIEWS = BASE_URL + "%s/reviews";
+
     private static final String TOP_RATED = BASE_URL + "top_rated";
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String API_KEY = BuildConfig.API_KEY; //Replace API Key here, or define in gradle.properties
@@ -103,13 +106,26 @@ public class Server {
     }
 
 
-    public static void getTopRatedMovies(int pageNumber, ServerListener listener){
+    private static void getTopRatedMovies(int pageNumber, ServerListener listener){
         doRequest(TOP_RATED, pageNumber, listener);
     }
 
-    public static void getPopularMovies(int pageNumber, ServerListener listener){
+    private static void getPopularMovies(int pageNumber, ServerListener listener){
         doRequest(POPULAR, pageNumber, listener);
     }
+
+    public static void getTrailers(int movieId, ServerListener listener){
+        doRequest(String.format(TRAILERS, movieId), listener);
+    }
+
+    public static void getReviews(int movieId, ServerListener listener){
+        doRequest(String.format(REVIEWS, movieId), listener);
+    }
+
+    private static void doRequest(String url, final ServerListener listener) {
+        doRequest(url, -1, listener);
+    }
+
 
     /**
      * Asynchronously do a getRequest with the given URL, and return a string through the given listener
