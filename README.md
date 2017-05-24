@@ -13,6 +13,7 @@ And the implementation guide is here: https://docs.google.com/document/d/1ZlN1fU
  
 Get an API key here:
 https://www.themoviedb.org/account/signup
+https://www.themoviedb.org/settings/api
 
 and API examples here:
 https://developers.themoviedb.org/3/movies/get-popular-movies
