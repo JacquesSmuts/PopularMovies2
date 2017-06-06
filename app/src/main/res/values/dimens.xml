@@ -2,5 +2,6 @@
 <resources>
     <dimen name="grid_layout_margin">4dp</dimen>
     <dimen name="grid_layout_padding">2dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 
 </resources>

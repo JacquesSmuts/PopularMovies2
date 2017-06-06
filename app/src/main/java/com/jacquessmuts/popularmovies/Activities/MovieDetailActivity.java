@@ -2,6 +2,11 @@ package com.jacquessmuts.popularmovies.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +14,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jacquessmuts.popularmovies.Fragments.TrailerFragment;
+import com.jacquessmuts.popularmovies.Fragments.dummy.DummyContent;
 import com.jacquessmuts.popularmovies.Models.Movie;
 import com.jacquessmuts.popularmovies.Models.Review;
 import com.jacquessmuts.popularmovies.Models.Trailer;
@@ -37,6 +44,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_synopsis) TextView textview_synopsis;
     @BindView(R.id.imageview_poster) ImageView imageview_poster;
     @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
+    @BindView(R.id.view_pager) ViewPager view_pager;
+
+    TrailersReviewsPagerAdapter adapterViewPager;
 
     public static Intent getIntent(Context context, Movie movie){
         Intent intent = new Intent(context, MovieDetailActivity.class);
@@ -44,6 +54,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         return intent;
     }
 
+    /**
+     * OVERRIDES
+     */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +67,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         populateContents();
         downloadAdditionalData();
     }
+
+    /**
+     * METHODS
+     */
 
     private void handleExtras(){
         Bundle extras = getIntent().getExtras();
@@ -76,6 +93,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         textview_date.setText(mMovie.getRelease_date());
         textview_synopsis.setText(mMovie.getOverview());
         swiperefresh_detail.setEnabled(false);
+
+        adapterViewPager = new TrailersReviewsPagerAdapter(getSupportFragmentManager(), mMovie, new TrailerFragmentListener());
+        view_pager.setAdapter(adapterViewPager);
     }
 
     private void downloadAdditionalData(){
@@ -98,6 +118,73 @@ public class MovieDetailActivity extends AppCompatActivity {
         mSuccessfulApiCount++;
         if (mSuccessfulApiCount >= TOTAL_API_CALLS){
             swiperefresh_detail.setRefreshing(false);
+        }
+        adapterViewPager.setMovie(mMovie);
+    }
+
+    /**
+     * CLASSES
+     */
+
+    public static class TrailersReviewsPagerAdapter extends FragmentPagerAdapter {
+        private static final int NUM_ITEMS = 2;
+        private static final int POS_TRAILER = 0;
+        private static final int POS_REVIEW = 1;
+
+        private Movie movie;
+        private TrailerFragment trailerFragment;
+        private TrailerFragment trailerFragmentTwo;
+
+        public TrailersReviewsPagerAdapter(FragmentManager fragmentManager, Movie movie, TrailerFragmentListener trailerFragmentListener) {
+            super(fragmentManager);
+            this.movie = movie;
+            trailerFragment = TrailerFragment.newInstance(1, trailerFragmentListener, movie.getTrailers());
+            trailerFragmentTwo = TrailerFragment.newInstance(1, trailerFragmentListener, movie.getTrailers());
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case POS_TRAILER:
+                    return trailerFragment;
+                case POS_REVIEW:
+                    return trailerFragmentTwo;//return reviewFragment;
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case POS_TRAILER:
+                    return "Trailers";//getItem(position).getContext().getString(R.string.trailers_title);
+                case POS_REVIEW:
+                    return "Reviews";//getItem(position).getContext().getString(R.string.reviews_title);
+                default:
+                    return null;
+            }
+        }
+
+        public void setMovie(Movie movie) {
+            this.movie = movie;
+            trailerFragment.setTrailers(this.movie.getTrailers());
+        }
+    }
+
+    private class TrailerFragmentListener implements TrailerFragment.OnListFragmentInteractionListener{
+
+        @Override
+        public void onTrailerClick(Trailer item) {
+            String url = "http://www.youtube.com/watch?v=" + item.getKey();
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         }
     }
 
