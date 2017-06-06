@@ -75,6 +75,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         textview_rating.setText(String.valueOf(mMovie.getVote_average()));
         textview_date.setText(mMovie.getRelease_date());
         textview_synopsis.setText(mMovie.getOverview());
+        swiperefresh_detail.setEnabled(false);
     }
 
     private void downloadAdditionalData(){

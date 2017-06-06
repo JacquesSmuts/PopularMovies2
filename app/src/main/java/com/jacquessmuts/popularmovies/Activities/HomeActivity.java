@@ -1,6 +1,7 @@
 package com.jacquessmuts.popularmovies.Activities;
 
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -82,14 +83,17 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
     }
 
     private void setupRecyclerView(){
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            mLayoutManager = new GridLayoutManager(this, 3);
-        } else{
-            mLayoutManager = new GridLayoutManager(this, 5);
+        int columns = 3;
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            columns = 5;
         }
-        swiperefresh_home.setOnRefreshListener(this);
+        mLayoutManager = new GridLayoutManager(this, columns);
         recyclerview_home.setLayoutManager(mLayoutManager);
+
+        int marginInPixels = (int) getResources().getDimension(R.dimen.grid_layout_margin);
+        recyclerview_home.addItemDecoration(new GridSpacingItemDecoration(columns, marginInPixels, true));
         recyclerview_home.setHasFixedSize(true);
+        swiperefresh_home.setOnRefreshListener(this);
 
         mMovieListAdapter = new MovieListAdapter(this);
         recyclerview_home.setAdapter(mMovieListAdapter);
@@ -203,6 +207,45 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
                 getData(current_page);
 
                 loading = true;
+            }
+        }
+    }
+
+    /**
+     * https://stackoverflow.com/questions/28531996/android-recyclerview-gridlayoutmanager-column-spacing/30701422
+     * Adds even spacing betwen items in listview
+     */
+    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spanCount;
+        private int spacing;
+        private boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+            int column = position % spanCount; // item column
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+
+                if (position < spanCount) { // top edge
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing; // item bottom
+            } else {
+                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+                if (position >= spanCount) {
+                    outRect.top = spacing; // item top
+                }
             }
         }
     }

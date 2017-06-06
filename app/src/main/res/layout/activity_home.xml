@@ -14,7 +14,8 @@ tools:context="com.jacquessmuts.popularmovies.Activities.HomeActivity">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview_home"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:background="@color/primary_light"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 

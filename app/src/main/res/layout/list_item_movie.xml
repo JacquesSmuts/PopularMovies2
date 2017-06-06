@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_margin="0dp"
     android:orientation="vertical">
 
-    <!--This TextView holds the weather data for one particular day in the forecast-->
     <ImageView
         android:id="@+id/image_movie_poster"
         style="@style/TextAppearance.AppCompat.Large"
@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:minHeight="100dp"
         android:minWidth="100dp"
-        android:padding="8dp"/>
+        android:padding="@dimen/grid_layout_padding"
+        android:background="@drawable/selector_movie_background"/>
 
-</LinearLayout>
+</android.support.v7.widget.CardView>
