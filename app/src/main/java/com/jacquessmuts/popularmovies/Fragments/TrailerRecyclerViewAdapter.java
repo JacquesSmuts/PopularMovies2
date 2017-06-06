@@ -1,17 +1,24 @@
 package com.jacquessmuts.popularmovies.Fragments;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jacquessmuts.popularmovies.Fragments.TrailerFragment.OnListFragmentInteractionListener;
 import com.jacquessmuts.popularmovies.Fragments.dummy.DummyContent.DummyItem;
 import com.jacquessmuts.popularmovies.Models.Trailer;
 import com.jacquessmuts.popularmovies.R;
+import com.jacquessmuts.popularmovies.Utils.Server;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
@@ -43,8 +50,15 @@ public class TrailerRecyclerViewAdapter extends RecyclerView.Adapter<TrailerRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.item = trailers.get(position);
-        holder.idView.setText(trailers.get(position).getName());
-        holder.contentView.setText(trailers.get(position).getSite());
+        holder.trailer_name.setText(holder.item.getName());
+        holder.trailer_site.setText(holder.item.getSite());
+
+        Context context = holder.trailer_image.getContext();
+
+        Picasso.with(context)
+                .load(Server.buildYouTubeImageUrl(holder.item.getKey()))
+                .placeholder(android.R.drawable.stat_sys_download)
+                .into(holder.trailer_image);
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,20 +81,21 @@ public class TrailerRecyclerViewAdapter extends RecyclerView.Adapter<TrailerRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
-        public final TextView idView;
-        public final TextView contentView;
+        @BindView(R.id.trailer_name) TextView trailer_name;
+        @BindView(R.id.trailer_site) TextView trailer_site;
+        @BindView(R.id.trailer_image) ImageView trailer_image;
+
         public Trailer item;
 
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            idView = (TextView) view.findViewById(R.id.id);
-            contentView = (TextView) view.findViewById(R.id.content);
+            ButterKnife.bind(this, view);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + contentView.getText() + "'";
+            return super.toString() + " '" + trailer_name.getText() + "'";
         }
     }
 }

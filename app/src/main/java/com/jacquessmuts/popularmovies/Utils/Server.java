@@ -38,6 +38,7 @@ public class Server {
 
     private static final String TOP_RATED = BASE_URL + "top_rated";
     private static final String BASE_IMAGE_URL = "http://image.tmdb.org/t/p/";
+    private static final String YOUTUBE_IMAGE_URL = "https://img.youtube.com/vi/%s/mqdefault.jpg";
     private static final String API_KEY = BuildConfig.API_KEY; //Replace API Key here, or define in gradle.properties
     private static final String API_KEY_APPEND ="?api_key=" + API_KEY;
     private static final String PAGE_NUMBER = "&page=";
@@ -87,6 +88,11 @@ public class Server {
         url += relativePath;
 
         return url;
+    }
+
+
+    public static String buildYouTubeImageUrl(String key){
+        return String.format(YOUTUBE_IMAGE_URL, key);
     }
 
     public static void getMovies(SortingOption option, ServerListener listener){

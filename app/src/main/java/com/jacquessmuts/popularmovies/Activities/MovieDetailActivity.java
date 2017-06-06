@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -86,6 +87,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
         Picasso.with(this)
                 .load(Server.buildImageUrl(this, mMovie.getPoster_path()))
+                .placeholder(android.R.drawable.stat_sys_download)
                 .into(imageview_poster);
 
         textview_title.setText(mMovie.getOriginal_title());
@@ -183,8 +185,12 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         @Override
         public void onTrailerClick(Trailer item) {
-            String url = "http://www.youtube.com/watch?v=" + item.getKey();
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            if (item.getSite().toLowerCase().contains("youtube")){
+                String url = "http://www.youtube.com/watch?v=" + item.getKey();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+            } else {
+                Log.e("MovieDetailActivity", "Figure out site other than YouTube. Key=" + item.getKey());
+            }
         }
     }
 
