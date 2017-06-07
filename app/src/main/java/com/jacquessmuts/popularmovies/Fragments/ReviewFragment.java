@@ -10,8 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jacquessmuts.popularmovies.Adapters.TrailerRecyclerViewAdapter;
-import com.jacquessmuts.popularmovies.Models.Trailer;
+import com.jacquessmuts.popularmovies.Models.Review;
 import com.jacquessmuts.popularmovies.R;
 
 import java.util.ArrayList;
@@ -26,64 +25,64 @@ import butterknife.ButterKnife;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class TrailerFragment extends Fragment {
+public class ReviewFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final String ARG_TRAILERS = "trailers";
+    private static final String ARG_REVIEWS = "reviews";
 
     private int columnCount = 1;
 
-    private List<Trailer> trailers;
+    private List<Review> reviews;
 
-    private OnListFragmentInteractionListener listener;
-    private TrailerRecyclerViewAdapter adapter;
+    private ReviewFragment.OnListFragmentInteractionListener listener;
+    private ReviewRecyclerViewAdapter adapter;
 
-    @BindView(R.id.recyclerview_trailer) RecyclerView recyclerview_trailer;
+    @BindView(R.id.recyclerview_reviews) RecyclerView recyclerview_reviews;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public TrailerFragment() {
+    public ReviewFragment() {
     }
 
-    public static TrailerFragment newInstance(int columnCount, OnListFragmentInteractionListener listener, ArrayList<Trailer> trailers) {
-        TrailerFragment fragment = new TrailerFragment();
+    // TODO: Customize parameter initialization
+    @SuppressWarnings("unused")
+    public static ReviewFragment newInstance(int columnCount, ReviewFragment.OnListFragmentInteractionListener listener, ArrayList<Review> reviews) {
+        ReviewFragment fragment = new ReviewFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        args.putParcelableArrayList(ARG_TRAILERS, trailers);
+        args.putParcelableArrayList(ARG_REVIEWS, reviews);
         fragment.setArguments(args);
         fragment.setListener(listener);
         return fragment;
     }
 
-    /**
-     * OVERRIDES
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             columnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            trailers = getArguments().getParcelableArrayList(ARG_TRAILERS);
+            reviews = getArguments().getParcelableArrayList(ARG_REVIEWS);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_trailer, container, false);
+        View view = inflater.inflate(R.layout.fragment_review, container, false);
         ButterKnife.bind(this, view);
 
         // Set the adapter
         Context context = view.getContext();
         if (columnCount <= 1) {
-            recyclerview_trailer.setLayoutManager(new LinearLayoutManager(context));
+            recyclerview_reviews.setLayoutManager(new LinearLayoutManager(context));
         } else {
-            recyclerview_trailer.setLayoutManager(new GridLayoutManager(context, columnCount));
+            recyclerview_reviews.setLayoutManager(new GridLayoutManager(context, columnCount));
         }
-        adapter = new TrailerRecyclerViewAdapter(trailers, listener);
-        recyclerview_trailer.setAdapter(adapter);
+        adapter = new ReviewRecyclerViewAdapter(reviews, listener);
+        recyclerview_reviews.setAdapter(adapter);
 
         return view;
     }
@@ -93,7 +92,7 @@ public class TrailerFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 //        if (context instanceof OnListFragmentInteractionListener) {
-//            listener = (OnListFragmentInteractionListener) context;
+//            mListener = (OnListFragmentInteractionListener) context;
 //        } else {
 //            throw new RuntimeException(context.toString()
 //                    + " must implement OnListFragmentInteractionListener");
@@ -106,26 +105,18 @@ public class TrailerFragment extends Fragment {
         listener = null;
     }
 
-    /**
-     * METHODS
-     */
-
-    public void setTrailers(List<Trailer> mTrailers) {
-        this.trailers = mTrailers;
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
         if (adapter != null){
-            adapter.setTrailers(trailers);
+            adapter.setReviews(reviews);
         } else {
-            adapter = new TrailerRecyclerViewAdapter(trailers, listener);
+            adapter = new ReviewRecyclerViewAdapter(reviews, listener);
         }
     }
 
-    public void setListener(OnListFragmentInteractionListener mListener) {
+    public void setListener(ReviewFragment.OnListFragmentInteractionListener mListener) {
         this.listener = mListener;
     }
-
-    /**
-     * INTERFACES
-     */
 
     /**
      * This interface must be implemented by activities that contain this
@@ -138,6 +129,6 @@ public class TrailerFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onTrailerClick(Trailer item);
+        void onListFragmentInteraction(Review item);
     }
 }

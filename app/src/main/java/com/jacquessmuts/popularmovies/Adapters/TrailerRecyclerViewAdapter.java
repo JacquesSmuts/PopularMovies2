@@ -1,4 +1,4 @@
-package com.jacquessmuts.popularmovies.Fragments;
+package com.jacquessmuts.popularmovies.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jacquessmuts.popularmovies.Fragments.TrailerFragment.OnListFragmentInteractionListener;
-import com.jacquessmuts.popularmovies.Fragments.dummy.DummyContent.DummyItem;
 import com.jacquessmuts.popularmovies.Models.Trailer;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
@@ -20,11 +19,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class TrailerRecyclerViewAdapter extends RecyclerView.Adapter<TrailerRecyclerViewAdapter.ViewHolder> {
 
     private List<Trailer> trailers;
@@ -43,7 +37,7 @@ public class TrailerRecyclerViewAdapter extends RecyclerView.Adapter<TrailerRecy
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_trailer, parent, false);
+                .inflate(R.layout.list_item_trailer, parent, false);
         return new ViewHolder(view);
     }
 

@@ -22,6 +22,7 @@ android {
 
 ext {
     supportLibraryVersion = "25.3.1"
+    icePickVersion = "3.2.0"
 }
 
 dependencies {
@@ -32,6 +33,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "frankiesardo:icepick:$icePickVersion"
+    provided "frankiesardo:icepick-processor:$icePickVersion"
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile 'com.google.code.gson:gson:2.8.0'

@@ -1,0 +1,105 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/imageview_poster"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/release_date"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/textview_title"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/textview_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        tools:text="Title of the movie"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        app:layout_constraintLeft_toRightOf="@+id/imageview_poster"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageview_poster"
+        app:layout_constraintHorizontal_bias="0.176"
+        app:layout_constraintWidth_default="wrap"/>
+
+    <TextView
+        android:id="@+id/textview_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="rating"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@+id/textView"
+        app:layout_constraintLeft_toLeftOf="@+id/textview_date" />
+
+    <TextView
+        android:id="@+id/textview_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        tools:text="date"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textview_synopsis"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageview_poster"
+        tools:text="lorem ipsum synopsym" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/user_rating"
+        app:layout_constraintLeft_toLeftOf="@+id/textview_title"
+        app:layout_constraintTop_toBottomOf="@+id/textview_title" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/release_date"
+        app:layout_constraintLeft_toLeftOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/tv_error_message_display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/error_message"
+        android:textSize="20sp"
+        android:visibility="invisible"
+        android:background="@android:color/white"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+</android.support.constraint.ConstraintLayout>

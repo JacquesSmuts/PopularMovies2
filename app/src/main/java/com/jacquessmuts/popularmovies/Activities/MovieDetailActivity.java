@@ -15,8 +15,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jacquessmuts.popularmovies.Fragments.ReviewFragment;
 import com.jacquessmuts.popularmovies.Fragments.TrailerFragment;
-import com.jacquessmuts.popularmovies.Fragments.dummy.DummyContent;
 import com.jacquessmuts.popularmovies.Models.Movie;
 import com.jacquessmuts.popularmovies.Models.Review;
 import com.jacquessmuts.popularmovies.Models.Trailer;
@@ -29,12 +29,14 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import icepick.Icepick;
+import icepick.State;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE = "extra_movie";
 
-    private Movie mMovie;
+    @State Movie mMovie;
     private int mSuccessfulApiCount = 0;
     private static final int TOTAL_API_CALLS = 2;
 
@@ -65,8 +67,15 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_detail);
         ButterKnife.bind(this);
         handleExtras();
+        Icepick.restoreInstanceState(this, savedInstanceState);
         populateContents();
         downloadAdditionalData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     /**
@@ -135,13 +144,15 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         private Movie movie;
         private TrailerFragment trailerFragment;
-        private TrailerFragment trailerFragmentTwo;
+        private ReviewFragment reviewFragment;
+        private TrailerFragmentListener listener;
 
         public TrailersReviewsPagerAdapter(FragmentManager fragmentManager, Movie movie, TrailerFragmentListener trailerFragmentListener) {
             super(fragmentManager);
             this.movie = movie;
+            this.listener = trailerFragmentListener;
             trailerFragment = TrailerFragment.newInstance(1, trailerFragmentListener, movie.getTrailers());
-            trailerFragmentTwo = TrailerFragment.newInstance(1, trailerFragmentListener, movie.getTrailers());
+            reviewFragment = ReviewFragment.newInstance(1, null, movie.getReviews());
         }
 
         @Override
@@ -152,11 +163,17 @@ public class MovieDetailActivity extends AppCompatActivity {
         // Returns the fragment to display for that page
         @Override
         public Fragment getItem(int position) {
+
+            if (trailerFragment == null || reviewFragment == null){
+                trailerFragment = TrailerFragment.newInstance(1, listener, movie.getTrailers());
+                reviewFragment = ReviewFragment.newInstance(1, null, movie.getReviews());
+            }
+
             switch (position) {
                 case POS_TRAILER:
                     return trailerFragment;
                 case POS_REVIEW:
-                    return trailerFragmentTwo;//return reviewFragment;
+                    return reviewFragment;//return reviewFragment;
                 default:
                     return null;
             }
@@ -178,6 +195,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         public void setMovie(Movie movie) {
             this.movie = movie;
             trailerFragment.setTrailers(this.movie.getTrailers());
+            reviewFragment.setReviews(this.movie.getReviews());
         }
     }
 

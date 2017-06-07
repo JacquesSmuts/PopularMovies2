@@ -2,12 +2,12 @@
 <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recyclerview_trailer"
-    android:name="com.jacquessmuts.popularmovies.Fragments.TrailerFragment"
+    android:id="@+id/recyclerview_reviews"
+    android:name="com.jacquessmuts.popularmovies.Fragments.ReviewFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.jacquessmuts.popularmovies.Fragments.TrailerFragment"
-    tools:listitem="@layout/fragment_trailer" />
+    tools:context="com.jacquessmuts.popularmovies.Fragments.ReviewFragment"
+    tools:listitem="@layout/list_item_review" />
