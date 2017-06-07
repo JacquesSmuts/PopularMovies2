@@ -66,6 +66,7 @@ public class ReviewFragment extends Fragment {
             columnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             reviews = getArguments().getParcelableArrayList(ARG_REVIEWS);
         }
+        setRetainInstance(true);
     }
 
     @Override

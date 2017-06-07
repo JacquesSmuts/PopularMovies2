@@ -30,6 +30,7 @@ public class Movie implements Parcelable {
     private int vote_count;
     private ArrayList<Trailer> trailers;
     private ArrayList<Review> reviews;
+    private boolean isFavorite;
 
     //GETTERS AND SETTERS
     public String getOverview() {
@@ -160,6 +161,15 @@ public class Movie implements Parcelable {
         this.reviews = reviews;
     }
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+
     //JSON handler
 
     /**
@@ -205,12 +215,13 @@ public class Movie implements Parcelable {
         dest.writeInt(this.vote_count);
         dest.writeTypedList(this.trailers);
         dest.writeTypedList(this.reviews);
+        dest.writeByte(this.isFavorite ? (byte) 1 : (byte) 0);
     }
 
     public Movie() {
     }
 
-    private Movie(Parcel in) {
+    protected Movie(Parcel in) {
         this.overview = in.readString();
         this.original_language = in.readString();
         this.original_title = in.readString();
@@ -227,6 +238,7 @@ public class Movie implements Parcelable {
         this.vote_count = in.readInt();
         this.trailers = in.createTypedArrayList(Trailer.CREATOR);
         this.reviews = in.createTypedArrayList(Review.CREATOR);
+        this.isFavorite = in.readByte() != 0;
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {

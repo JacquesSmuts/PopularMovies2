@@ -67,6 +67,7 @@ public class TrailerFragment extends Fragment {
             columnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             trailers = getArguments().getParcelableArrayList(ARG_TRAILERS);
         }
+        setRetainInstance(true);
     }
 
     @Override

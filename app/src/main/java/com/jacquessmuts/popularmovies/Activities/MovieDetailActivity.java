@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import icepick.Icepick;
 import icepick.State;
 
@@ -36,7 +39,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE = "extra_movie";
 
-    @State Movie mMovie;
+    @State Movie movie;
     private int mSuccessfulApiCount = 0;
     private static final int TOTAL_API_CALLS = 2;
 
@@ -47,6 +50,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.textview_synopsis) TextView textview_synopsis;
     @BindView(R.id.imageview_poster) ImageView imageview_poster;
     @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
+    @BindView(R.id.checkbox_movie_favorite) CheckBox checkbox_movie_favorite;
     @BindView(R.id.view_pager) ViewPager view_pager;
 
     TrailersReviewsPagerAdapter adapterViewPager;
@@ -85,35 +89,37 @@ public class MovieDetailActivity extends AppCompatActivity {
     private void handleExtras(){
         Bundle extras = getIntent().getExtras();
         if (extras.containsKey(EXTRA_MOVIE)){
-            mMovie = extras.getParcelable(EXTRA_MOVIE);
+            movie = extras.getParcelable(EXTRA_MOVIE);
         }
     }
 
     private void populateContents(){
-        if (mMovie == null){
+        if (movie == null){
             finish();
             return;
         }
         Picasso.with(this)
-                .load(Server.buildImageUrl(this, mMovie.getPoster_path()))
+                .load(Server.buildImageUrl(this, movie.getPoster_path()))
                 .placeholder(android.R.drawable.stat_sys_download)
                 .into(imageview_poster);
 
-        textview_title.setText(mMovie.getOriginal_title());
-        textview_rating.setText(String.valueOf(mMovie.getVote_average()));
-        textview_date.setText(mMovie.getRelease_date());
-        textview_synopsis.setText(mMovie.getOverview());
+        textview_title.setText(movie.getOriginal_title());
+        textview_rating.setText(String.valueOf(movie.getVote_average()));
+        textview_date.setText(movie.getRelease_date());
+        textview_synopsis.setText(movie.getOverview());
         swiperefresh_detail.setEnabled(false);
 
-        adapterViewPager = new TrailersReviewsPagerAdapter(getSupportFragmentManager(), mMovie, new TrailerFragmentListener());
+        checkbox_movie_favorite.setChecked(movie.isFavorite());
+
+        adapterViewPager = new TrailersReviewsPagerAdapter(getSupportFragmentManager(), movie, new TrailerFragmentListener());
         view_pager.setAdapter(adapterViewPager);
     }
 
     private void downloadAdditionalData(){
         if (Util.getConnected(this)) {
             mSuccessfulApiCount = 0;
-            Server.getTrailers(mMovie.getId(), new GetTrailersListener());
-            Server.getReviews(mMovie.getId(), new GetReviewsListener());
+            Server.getTrailers(movie.getId(), new GetTrailersListener());
+            Server.getReviews(movie.getId(), new GetReviewsListener());
             swiperefresh_detail.setRefreshing(true);
         } else {
             handleServerSuccess(false);
@@ -130,14 +136,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (mSuccessfulApiCount >= TOTAL_API_CALLS){
             swiperefresh_detail.setRefreshing(false);
         }
-        adapterViewPager.setMovie(mMovie);
+        adapterViewPager.setMovie(movie);
     }
 
     /**
      * CLASSES
      */
 
-    public static class TrailersReviewsPagerAdapter extends FragmentPagerAdapter {
+    @OnCheckedChanged(R.id.checkbox_movie_favorite)
+    void checkChanged(CompoundButton button, boolean checked){
+        movie.setFavorite(checked);
+        //TODO: database operation
+    }
+
+    private static class TrailersReviewsPagerAdapter extends FragmentPagerAdapter {
         private static final int NUM_ITEMS = 2;
         private static final int POS_TRAILER = 0;
         private static final int POS_REVIEW = 1;
@@ -237,7 +249,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void run() {
                 final ArrayList<Trailer> trailers = Trailer.listFromJson(response);
                 //mTrailerListAdapter.addData(trailers);
-                mMovie.setTrailers(trailers);
+                movie.setTrailers(trailers);
                 handleServerSuccess(trailers != null && trailers.size() > 0);
             }
         });
@@ -251,7 +263,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             @Override
             public void run() {
                 final ArrayList<Review> reviews = Review.listFromJson(response);
-                mMovie.setReviews(reviews);
+                movie.setReviews(reviews);
                 //mTrailerListAdapter.addData(trailers);
                 handleServerSuccess(reviews != null && reviews.size() > 0);
             }
