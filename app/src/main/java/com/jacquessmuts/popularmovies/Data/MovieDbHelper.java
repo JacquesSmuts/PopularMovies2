@@ -69,7 +69,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                  * MovieEntry implements the interface, "BaseColumns", which does have a field
                  * named "_ID". We use that here to designate our table's primary key.
                  */
-                MovieContract.MovieEntry.COLUMN_MOVIE_ID       + " INTEGER PRIMARY KEY NOT NULL, "                 +
+                MovieContract.MovieEntry.COLUMN_MOVIE_ID       + " INTEGER PRIMARY KEY NOT NULL ON CONFLICT REPLACE, "                 +
 //                MovieContract.MovieEntry.COLUMN_ORIGINAL_LANGUAGE   + " TEXT, "                    +
                 MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE   + " TEXT, "                    +
 //                MovieContract.MovieEntry.COLUMN_TITLE   + " TEXT, "                    +

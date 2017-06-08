@@ -1,5 +1,7 @@
 package com.jacquessmuts.popularmovies.Activities;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -150,8 +152,23 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     @OnCheckedChanged(R.id.checkbox_movie_favorite)
     void checkChanged(CompoundButton button, boolean checked){
         movie.setFavorite(checked);
-        //TODO: database operation
-    }
+
+        ContentValues movieValues = new ContentValues();
+        movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movie.getId());
+        movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, movie.getOriginal_title());
+        movieValues.put(MovieContract.MovieEntry.COLUMN_OVERVIEW, movie.getOverview());
+        movieValues.put(MovieContract.MovieEntry.COLUMN_POSTER_PATH, movie.getPoster_path());
+        movieValues.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVote_average());
+        movieValues.put(MovieContract.MovieEntry.COLUMN_IS_FAVORITE, movie.isFavorite());
+
+        /* Get a handle on the ContentResolver to delete and insert data */
+        ContentResolver movieContentResolver = getContentResolver();
+
+            /* Insert Favorite */
+        movieContentResolver.insert(
+                MovieContract.MovieEntry.CONTENT_URI,
+                movieValues);
+        }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

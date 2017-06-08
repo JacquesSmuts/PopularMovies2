@@ -17,9 +17,11 @@ package com.jacquessmuts.popularmovies.Data;
 
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -358,8 +360,42 @@ public class MovieProvider extends ContentProvider {
      */
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        throw new RuntimeException(
-                "We are not implementing insert in Sunshine. Use bulkInsert instead");
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        long id = 0;
+        switch (sUriMatcher.match(uri)) {
+            case CODE_MOVIE:
+                db.beginTransaction();
+                try {
+                    id = db.insertWithOnConflict(
+                            MovieContract.MovieEntry.TABLE_NAME,
+                            null,
+                            values,
+                            SQLiteDatabase.CONFLICT_REPLACE);
+
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (id > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return getUriForId(id, uri);
+        }
+        return null;
+    }
+
+    private Uri getUriForId(long id, Uri uri) {
+        if (id > 0) {
+            Uri itemUri = ContentUris.withAppendedId(uri, id);
+
+            return itemUri;
+        }
+        // s.th. went wrong:
+        throw new SQLException(
+                "Problem while inserting into uri: " + uri);
     }
 
     @Override

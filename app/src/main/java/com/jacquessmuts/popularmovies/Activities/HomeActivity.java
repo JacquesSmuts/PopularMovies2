@@ -71,7 +71,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int ID_FORECAST_LOADER = 42;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
