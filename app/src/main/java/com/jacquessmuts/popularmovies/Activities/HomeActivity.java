@@ -1,7 +1,12 @@
 package com.jacquessmuts.popularmovies.Activities;
 
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Rect;
+import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
+import com.jacquessmuts.popularmovies.Data.MovieContract;
 import com.jacquessmuts.popularmovies.Models.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
@@ -25,18 +31,46 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HomeActivity extends AppCompatActivity implements MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
+public class HomeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.swiperefresh_home) SwipeRefreshLayout swiperefresh_home;
     @BindView(R.id.recyclerview_home) RecyclerView recyclerview_home;
-    private GridLayoutManager mLayoutManager;
-    private MovieListAdapter mMovieListAdapter;
-    private ScrollPagingListener mScrollListener;
+    private GridLayoutManager layoutManager;
+    private MovieListAdapter movieListAdapter;
+    private ScrollPagingListener scrollListener;
 
     @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
     @BindView(R.id.pb_loading_indicator) ProgressBar pb_loading_indicator;
 
-    private Server.SortingOption mSortingOption;
+    private Server.SortingOption sortingOption;
+    private Cursor cursor;
+
+    /*
+    * The columns of data that we are interested in displaying within the list
+    */
+    public static final String[] MAIN_MOVIES_PROJECTION = {
+            MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+            MovieContract.MovieEntry.COLUMN_OVERVIEW,
+            MovieContract.MovieEntry.COLUMN_POSTER_PATH,
+            MovieContract.MovieEntry.COLUMN_IS_FAVORITE,
+            MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE
+    };
+
+    /*
+     * We store the indices of the values in the array of Strings above to more quickly be able to
+     * access the data from our query. If the order of the Strings above changes, these indices
+     * must be adjusted to match the order of the Strings.
+     */
+    public static final int INDEX_MOVIE_ID = 0;
+    public static final int INDEX_ORIGINAL_TITLE = 1;
+    public static final int INDEX_OVERVIEW = 2;
+    public static final int INDEX_POSTER_PATH = 3;
+    public static final int INDEX_IS_FAVORITE = 4;
+    public static final int INDEX_VOTE_AVERAGE = 5;
+
+    private static final int ID_FORECAST_LOADER = 42;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +78,10 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         setupRecyclerView();
-        mSortingOption = Server.SortingOption.POPULAR;
+
+        getSupportLoaderManager().initLoader(ID_FORECAST_LOADER, null, this);
+
+        sortingOption = Server.SortingOption.POPULAR;
         onRefresh();
     }
 
@@ -70,11 +107,15 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_sort_popular:
-                mSortingOption = Server.SortingOption.POPULAR;
+                sortingOption = Server.SortingOption.POPULAR;
                 onRefresh();
                 return true;
             case R.id.menu_sort_rating:
-                mSortingOption = Server.SortingOption.RATING;
+                sortingOption = Server.SortingOption.RATING;
+                onRefresh();
+                return true;
+            case R.id.menu_sort_favorite:
+                sortingOption = Server.SortingOption.FAVORITE;
                 onRefresh();
                 return true;
             default:
@@ -87,33 +128,47 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             columns = 5;
         }
-        mLayoutManager = new GridLayoutManager(this, columns);
-        recyclerview_home.setLayoutManager(mLayoutManager);
+        layoutManager = new GridLayoutManager(this, columns);
+        recyclerview_home.setLayoutManager(layoutManager);
 
         int marginInPixels = (int) getResources().getDimension(R.dimen.grid_layout_margin);
         recyclerview_home.addItemDecoration(new GridSpacingItemDecoration(columns, marginInPixels, true));
         recyclerview_home.setHasFixedSize(true);
         swiperefresh_home.setOnRefreshListener(this);
 
-        mMovieListAdapter = new MovieListAdapter(this);
-        recyclerview_home.setAdapter(mMovieListAdapter);
+        movieListAdapter = new MovieListAdapter(this);
+        recyclerview_home.setAdapter(movieListAdapter);
 
-        mScrollListener = new ScrollPagingListener(mLayoutManager);
-        recyclerview_home.addOnScrollListener(mScrollListener);
+        scrollListener = new ScrollPagingListener(layoutManager);
+        recyclerview_home.addOnScrollListener(scrollListener);
     }
 
     private void getData(int pageNumber){
-        if (pageNumber > 1) {
-            swiperefresh_home.setRefreshing(true);
+
+        if (sortingOption == Server.SortingOption.FAVORITE && cursor != null){
+
+            //Data is loaded from database and handled through cursor
+            movieListAdapter.swapCursor(cursor);
+            recyclerview_home.removeOnScrollListener(scrollListener);
+            recyclerview_home.smoothScrollToPosition(0);
+            setLoading(false);
+            handleServerSuccess(cursor.getCount() > 0);
         } else {
-            recyclerview_home.removeOnScrollListener(mScrollListener);
-            mScrollListener = new ScrollPagingListener(mLayoutManager);
-            recyclerview_home.addOnScrollListener(mScrollListener);
-        }
-        if (Util.getConnected(this)) {
-            Server.getMovies(mSortingOption, pageNumber, new GetMoviesListener());
-        } else {
-            handleServerSuccess(false);
+
+            //Data is loaded from server and handled through ArrayList
+            if (pageNumber > 1) {
+                swiperefresh_home.setRefreshing(true);
+            } else {
+                recyclerview_home.removeOnScrollListener(scrollListener);
+                scrollListener = new ScrollPagingListener(layoutManager);
+                recyclerview_home.addOnScrollListener(scrollListener);
+            }
+            movieListAdapter.swapCursor(null);
+            if (Util.getConnected(this)) {
+                Server.getMovies(sortingOption, pageNumber, new GetMoviesListener());
+            } else {
+                handleServerSuccess(false);
+            }
         }
     }
 
@@ -138,10 +193,10 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
                 setLoading(false);
                 handleServerSuccess(movies != null && movies.size() > 0);
                 if (swiperefresh_home.isRefreshing()){
-                    mMovieListAdapter.addData(movies);
+                    movieListAdapter.addData(movies);
                     swiperefresh_home.setRefreshing(false);
                 } else {
-                    mMovieListAdapter.setData(movies);
+                    movieListAdapter.setData(movies);
                 }
             }
         });
@@ -154,6 +209,56 @@ public class HomeActivity extends AppCompatActivity implements MovieListAdapter.
         } else {
             tv_error_message_display.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+
+            case ID_FORECAST_LOADER:
+                /* URI for all rows of weather data in our weather table */
+                Uri forecastQueryUri = MovieContract.MovieEntry.CONTENT_URI;
+                /* Sort order: Ascending by date */
+                //String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+                /*
+                 * A SELECTION in SQL declares which rows you'd like to return. In our case, we
+                 * want all weather data from today onwards that is stored in our weather table.
+                 * We created a handy method to do that in our WeatherEntry class.
+                 */
+                String selection = MovieContract.MovieEntry.getAllFavorites();
+
+                return new CursorLoader(this,
+                        forecastQueryUri,
+                        MAIN_MOVIES_PROJECTION,
+                        selection,
+                        null,
+                        null);
+
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+        }
+    }
+
+    /**
+     * Called when a Loader has finished loading its data.
+     *
+     * NOTE: There is one small bug in this code. If no data is present in the cursor do to an
+     * initial load being performed with no access to internet, the loading indicator will show
+     * indefinitely, until data is present from the ContentProvider. This will be fixed in a
+     * future version of the course.
+     *
+     * @param loader The Loader that has finished.
+     * @param data   The data generated by the Loader.
+     */
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        cursor = data;
+        onRefresh();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        movieListAdapter.swapCursor(null);
     }
 
     private class GetMoviesListener implements Server.ServerListener{

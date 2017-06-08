@@ -1,11 +1,14 @@
 <resources>
     <string name="app_name">PopularMovies</string>
     <string name="error_message">Something went wrong. Please check your internet connection and try again.</string>
+    <string name="menu_sort">Sort…</string>
     <string name="sort_top">Sort by rating</string>
     <string name="sort_popular">Sort by popularity</string>
+    <string name="show_favorites">Show Favorites</string>
     <string name="user_rating">User Rating:</string>
     <string name="release_date">Release Date:</string>
     <string name="poster_content_description">Poster of the movie</string>
     <string name="trailers_title">Trailers</string>
     <string name="reviews_title">Reviews</string>
+    <string name="content_authority">com.jacquessmuts.popularmovies</string>
 </resources>

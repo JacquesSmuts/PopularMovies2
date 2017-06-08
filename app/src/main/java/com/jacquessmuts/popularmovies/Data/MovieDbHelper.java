@@ -28,7 +28,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      * This is the name of our database. Database names should be descriptive and end with the
      * .db extension.
      */
-    public static final String DATABASE_NAME = "weather.db";
+    public static final String DATABASE_NAME = "movie.db";
 
     /*
      * If you change the database schema, you must increment the database version or the onUpgrade
@@ -78,12 +78,12 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 //                MovieContract.MovieEntry.COLUMN_BACKDROP_PATH + " TEXT, "                    +
                 MovieContract.MovieEntry.COLUMN_RELEASE_DATE    + " TEXT," +
                 MovieContract.MovieEntry.COLUMN_POPULARITY + " TEXT,"                  +
-                MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE   + " TEXT, "                    +
+                MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE   + " DOUBLE, "                    +
 //                MovieContract.MovieEntry.COLUMN_ADULT + " BOOL, "                    +
 //                MovieContract.MovieEntry.COLUMN_VOTE_COUNT    + " INTEGER," +
 //                MovieContract.MovieEntry.COLUMN_TRAILERS + " REAL NOT NULL,"                  +
 //                MovieContract.MovieEntry.COLUMN_REVIEWS   + " REAL NOT NULL, "                    +
-                MovieContract.MovieEntry.COLUMN_IS_FAVORITE    + " BOOL;";
+                MovieContract.MovieEntry.COLUMN_IS_FAVORITE    + " BOOL);";
 
         /*
          * After we've spelled out our SQLite table creation statement above, we actually execute

@@ -86,5 +86,8 @@ public class MovieContract {
         public static final String COLUMN_REVIEWS = "reviews";
         public static final String COLUMN_IS_FAVORITE = "isFavorite";
 
+        public static String getAllFavorites() {
+            return MovieEntry.COLUMN_IS_FAVORITE + " >= 1";
+        }
     }
 }

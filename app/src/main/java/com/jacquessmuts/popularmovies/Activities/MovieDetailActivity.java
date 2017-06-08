@@ -2,10 +2,13 @@ package com.jacquessmuts.popularmovies.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jacquessmuts.popularmovies.Data.MovieContract;
 import com.jacquessmuts.popularmovies.Fragments.ReviewFragment;
 import com.jacquessmuts.popularmovies.Fragments.TrailerFragment;
 import com.jacquessmuts.popularmovies.Models.Movie;
@@ -35,7 +39,7 @@ import butterknife.OnCheckedChanged;
 import icepick.Icepick;
 import icepick.State;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String EXTRA_MOVIE = "extra_movie";
 
@@ -147,6 +151,21 @@ public class MovieDetailActivity extends AppCompatActivity {
     void checkChanged(CompoundButton button, boolean checked){
         movie.setFavorite(checked);
         //TODO: database operation
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 
     private static class TrailersReviewsPagerAdapter extends FragmentPagerAdapter {

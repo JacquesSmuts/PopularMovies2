@@ -1,12 +1,14 @@
 package com.jacquessmuts.popularmovies.Adapters;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.jacquessmuts.popularmovies.Activities.HomeActivity;
 import com.jacquessmuts.popularmovies.Models.Movie;
 import com.jacquessmuts.popularmovies.R;
 import com.jacquessmuts.popularmovies.Utils.Server;
@@ -20,9 +22,10 @@ import java.util.ArrayList;
 
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MovieListViewHolder> {
 
-    private ArrayList<Movie> mMovieList;
+    private ArrayList<Movie> movieList;
+    private Cursor cursor;
 
-    private final MovieListOnClickHandler mClickHandler;
+    private final MovieListOnClickHandler clickHandler;
 
     public interface MovieListOnClickHandler {
         void onClick(Movie movieObject);
@@ -30,23 +33,39 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
 
 
     public MovieListAdapter(MovieListOnClickHandler clickHandler) {
-        mClickHandler = clickHandler;
+        this.clickHandler = clickHandler;
     }
 
     public class MovieListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final ImageView mImageMoviePoster;
+        private final ImageView imageMoviePoster;
 
         public MovieListViewHolder(View view) {
             super(view);
-            mImageMoviePoster = (ImageView) view.findViewById(R.id.image_movie_poster);
+            imageMoviePoster = (ImageView) view.findViewById(R.id.image_movie_poster);
             view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            Movie movie = mMovieList.get(getAdapterPosition());
-            mClickHandler.onClick(movie);
+            Movie movie;
+
+            if (cursor != null){
+                int adapterPosition = getAdapterPosition();
+                cursor.moveToPosition(adapterPosition);
+
+                movie = new Movie();
+                movie.setId(cursor.getInt(HomeActivity.INDEX_MOVIE_ID));
+                movie.setOriginal_title(cursor.getString(HomeActivity.INDEX_ORIGINAL_TITLE));
+                movie.setOverview(cursor.getString(HomeActivity.INDEX_OVERVIEW));
+                movie.setPoster_path(cursor.getString(HomeActivity.INDEX_POSTER_PATH));
+                movie.setFavorite(cursor.getInt(HomeActivity.INDEX_IS_FAVORITE) > 0);
+                movie.setVote_average(cursor.getDouble(HomeActivity.INDEX_VOTE_AVERAGE));
+
+            } else {
+                movie = movieList.get(getAdapterPosition());
+            }
+            clickHandler.onClick(movie);
         }
     }
 
@@ -69,29 +88,48 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
      */
     @Override
     public void onBindViewHolder(MovieListViewHolder movieListViewHolder, int position) {
-        Movie movieItem = mMovieList.get(position);
+        String posterPath = "";
+        if (cursor != null){
+            cursor.moveToPosition(position);
+            posterPath = cursor.getString(HomeActivity.INDEX_POSTER_PATH);
+        } else {
+            Movie movieItem = movieList.get(position);
+            posterPath = movieItem.getPoster_path();
+        }
 
-        Context context = movieListViewHolder.mImageMoviePoster.getContext();
+
+        Context context = movieListViewHolder.imageMoviePoster.getContext();
         Picasso.with(context)
-                .load(Server.buildImageUrl(context, movieItem.getPoster_path()))
+                .load(Server.buildImageUrl(context, posterPath))
                 .placeholder(android.R.drawable.stat_sys_download)
-                .into(movieListViewHolder.mImageMoviePoster);
+                .into(movieListViewHolder.imageMoviePoster);
     }
 
 
     @Override
     public int getItemCount() {
-        if (null == mMovieList) return 0;
-        return mMovieList.size();
+        int size = 0;
+        if (cursor != null) {
+            size = cursor.getCount();
+        } else if (movieList != null){
+            size = movieList.size();
+        }
+        return size;
     }
 
     public void setData(ArrayList<Movie> movieList) {
-        mMovieList = movieList;
+        this.movieList = movieList;
+        cursor = null;
+        notifyDataSetChanged();
+    }
+
+    public void swapCursor(Cursor newCursor) {
+        cursor = newCursor;
         notifyDataSetChanged();
     }
 
     public void addData(ArrayList<Movie> movieList){
-        mMovieList.addAll(movieList);
+        this.movieList.addAll(movieList);
         notifyDataSetChanged();
     }
 }

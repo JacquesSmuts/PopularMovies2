@@ -52,7 +52,7 @@ public class Server {
     }
 
     public enum SortingOption{
-        POPULAR, RATING
+        POPULAR, RATING, FAVORITE
     }
 
     private enum ImageSize {
