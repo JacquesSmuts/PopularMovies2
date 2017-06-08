@@ -89,5 +89,9 @@ public class MovieContract {
         public static String getAllFavorites() {
             return MovieEntry.COLUMN_IS_FAVORITE + " >= 1";
         }
+
+        public static String getByMovieId(int id){
+            return MovieEntry.COLUMN_MOVIE_ID + " = " + id;
+        }
     }
 }

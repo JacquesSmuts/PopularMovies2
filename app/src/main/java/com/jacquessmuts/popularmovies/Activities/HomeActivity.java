@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final int INDEX_IS_FAVORITE = 4;
     public static final int INDEX_VOTE_AVERAGE = 5;
 
-    private static final int ID_FORECAST_LOADER = 42;
+    private static final int ID_MOVIE_LOADER = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +78,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         ButterKnife.bind(this);
         setupRecyclerView();
 
-        getSupportLoaderManager().initLoader(ID_FORECAST_LOADER, null, this);
+        getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
 
         sortingOption = Server.SortingOption.POPULAR;
         onRefresh();
@@ -214,7 +214,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
         switch (loaderId) {
 
-            case ID_FORECAST_LOADER:
+            case ID_MOVIE_LOADER:
                 /* URI for all rows of weather data in our weather table */
                 Uri forecastQueryUri = MovieContract.MovieEntry.CONTENT_URI;
                 /* Sort order: Ascending by date */

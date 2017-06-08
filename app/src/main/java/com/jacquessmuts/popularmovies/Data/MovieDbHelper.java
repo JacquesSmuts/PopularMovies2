@@ -83,7 +83,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 //                MovieContract.MovieEntry.COLUMN_VOTE_COUNT    + " INTEGER," +
 //                MovieContract.MovieEntry.COLUMN_TRAILERS + " REAL NOT NULL,"                  +
 //                MovieContract.MovieEntry.COLUMN_REVIEWS   + " REAL NOT NULL, "                    +
-                MovieContract.MovieEntry.COLUMN_IS_FAVORITE    + " BOOL);";
+                MovieContract.MovieEntry.COLUMN_IS_FAVORITE    + " BOOLEAN NOT NULL);";
 
         /*
          * After we've spelled out our SQLite table creation statement above, we actually execute

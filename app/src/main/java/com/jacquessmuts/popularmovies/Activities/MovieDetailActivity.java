@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -61,6 +62,9 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
 
     TrailersReviewsPagerAdapter adapterViewPager;
 
+    public static final int ID_MOVIE_DETAIL_LOADER = 555;
+    private Cursor cursor;
+
     public static Intent getIntent(Context context, Movie movie){
         Intent intent = new Intent(context, MovieDetailActivity.class);
         intent.putExtra(EXTRA_MOVIE, movie);
@@ -78,6 +82,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         ButterKnife.bind(this);
         handleExtras();
         Icepick.restoreInstanceState(this, savedInstanceState);
+        getSupportLoaderManager().initLoader(ID_MOVIE_DETAIL_LOADER, null, this);
         populateContents();
         downloadAdditionalData();
     }
@@ -171,18 +176,39 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
+        switch (loaderId) {
+
+            case ID_MOVIE_DETAIL_LOADER:
+                Uri forecastQueryUri = MovieContract.MovieEntry.CONTENT_URI;
+
+                String selection = MovieContract.MovieEntry.getByMovieId(movie.getId());
+
+                return new CursorLoader(this,
+                        forecastQueryUri,
+                        HomeActivity.MAIN_MOVIES_PROJECTION,
+                        selection,
+                        null,
+                        null);
+
+            default:
+                throw new RuntimeException("Loader Not Implemented: " + loaderId);
+        }
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        cursor = data;
+        if (cursor != null && cursor.moveToFirst()) {
+            boolean isChecked = cursor.getInt(HomeActivity.INDEX_IS_FAVORITE) > 0;
+            if (checkbox_movie_favorite.isChecked() != isChecked) {
+                checkbox_movie_favorite.setChecked(isChecked);
+            }
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
     private static class TrailersReviewsPagerAdapter extends FragmentPagerAdapter {
