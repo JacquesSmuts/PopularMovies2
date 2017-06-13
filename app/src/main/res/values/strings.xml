@@ -11,4 +11,6 @@
     <string name="trailers_title">Trailers</string>
     <string name="reviews_title">Reviews</string>
     <string name="content_authority">com.jacquessmuts.popularmovies</string>
+    <string name="content_description_poster">The poster of the movie</string>
+
 </resources>
