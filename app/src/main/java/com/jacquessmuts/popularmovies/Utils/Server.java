@@ -84,6 +84,9 @@ public class Server {
             //for higher resolution screens, use a higher resolution image
             size = ImageSize.FOUR.getSize();
         }
+        if (Util.isTablet(context)){
+            size = ImageSize.FIVE.getSize();
+        }
         url += size;
         url += relativePath;
 

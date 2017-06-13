@@ -101,7 +101,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         Context context = movieListViewHolder.imageMoviePoster.getContext();
         Picasso.with(context)
                 .load(Server.buildImageUrl(context, posterPath))
-                .placeholder(android.R.drawable.stat_sys_download)
+                .placeholder(android.R.drawable.ic_input_get)
                 .into(movieListViewHolder.imageMoviePoster);
     }
 

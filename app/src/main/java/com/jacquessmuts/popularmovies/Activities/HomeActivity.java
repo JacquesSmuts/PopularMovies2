@@ -127,6 +127,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
             columns = 5;
         }
+        if (Util.isTablet(this)){
+            columns = columns+1;
+        }
         layoutManager = new GridLayoutManager(this, columns);
         recyclerview_home.setLayoutManager(layoutManager);
 
