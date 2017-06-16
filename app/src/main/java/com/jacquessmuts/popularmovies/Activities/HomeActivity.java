@@ -46,7 +46,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @State Server.SortingOption sortingOption;
     @State ArrayList<Movie> movieList;
-    @State int scrollPosition;
+    @State int scrollPosition = -1;
     private Cursor cursor;
 
     /*
@@ -88,8 +88,13 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         if (savedInstanceState == null){
             onRefresh();
         } else {
-            movieListAdapter.setData(movieList);
-            layoutManager.scrollToPosition(scrollPosition);
+            if (sortingOption == Server.SortingOption.FAVORITE){
+                onRefresh();
+            } else {
+                movieListAdapter.setData(movieList);
+                layoutManager.scrollToPosition(scrollPosition);
+                scrollPosition = -1;
+            }
         }
     }
 
@@ -272,6 +277,13 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         cursor = data;
+        if (sortingOption == Server.SortingOption.FAVORITE) {
+            getData(1);
+            if (scrollPosition > 0) {
+                layoutManager.scrollToPosition(scrollPosition);
+                scrollPosition = -1;
+            }
+        }
     }
 
     @Override
