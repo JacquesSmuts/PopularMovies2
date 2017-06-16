@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ import com.jacquessmuts.popularmovies.Utils.Util;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -283,7 +285,12 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
         public void onTrailerClick(Trailer item) {
             if (item.getSite().toLowerCase().contains("youtube")){
                 String url = "http://www.youtube.com/watch?v=" + item.getKey();
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                Intent youtubeIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                PackageManager packageManager = getPackageManager();
+                List activities = packageManager.queryIntentActivities(youtubeIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                if (activities.size() > 0){ //check if there are any activities to receive this intent
+                    startActivity(youtubeIntent);
+                }
             } else {
                 Log.e("MovieDetailActivity", "Figure out site other than YouTube. Key=" + item.getKey());
             }
