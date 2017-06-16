@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.DisplayMetrics;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.jacquessmuts.popularmovies.R;
 
 /**
@@ -29,6 +30,15 @@ public class Util {
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+    public static void errorMessageInternet(Context context){
+        new MaterialDialog.Builder(context)
+                .title(R.string.error_message_title)
+                .content(R.string.error_message_content)
+                .positiveText(R.string.error_message_button)
+                .show();
+
     }
 
 }

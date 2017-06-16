@@ -56,7 +56,6 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     @BindView(R.id.textview_date) TextView textview_date;
     @BindView(R.id.textview_synopsis) TextView textview_synopsis;
     @BindView(R.id.imageview_poster) ImageView imageview_poster;
-    @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
     @BindView(R.id.checkbox_movie_favorite) CheckBox checkbox_movie_favorite;
     @BindView(R.id.view_pager) ViewPager view_pager;
 
@@ -138,16 +137,15 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
     }
 
     private void handleServerSuccess(boolean success){
-        if (success){
-            tv_error_message_display.setVisibility(View.GONE);
+        if (!success){
+            Util.errorMessageInternet(this);
         } else {
-            tv_error_message_display.setVisibility(View.VISIBLE);
+            mSuccessfulApiCount++;
+            if (mSuccessfulApiCount >= TOTAL_API_CALLS) {
+                swiperefresh_detail.setRefreshing(false);
+            }
+            adapterViewPager.setMovie(movie);
         }
-        mSuccessfulApiCount++;
-        if (mSuccessfulApiCount >= TOTAL_API_CALLS){
-            swiperefresh_detail.setRefreshing(false);
-        }
-        adapterViewPager.setMovie(movie);
     }
 
     /**

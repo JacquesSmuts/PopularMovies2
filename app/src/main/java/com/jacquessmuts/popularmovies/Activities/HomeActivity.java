@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
 import com.jacquessmuts.popularmovies.Data.MovieContract;
 import com.jacquessmuts.popularmovies.Models.Movie;
@@ -39,7 +40,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     private MovieListAdapter movieListAdapter;
     private ScrollPagingListener scrollListener;
 
-    @BindView(R.id.tv_error_message_display) TextView tv_error_message_display;
     @BindView(R.id.pb_loading_indicator) ProgressBar pb_loading_indicator;
 
     private Server.SortingOption sortingOption;
@@ -206,10 +206,8 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void handleServerSuccess(boolean success){
-        if (success){
-            tv_error_message_display.setVisibility(View.GONE);
-        } else {
-            tv_error_message_display.setVisibility(View.VISIBLE);
+        if (!success){
+            Util.errorMessageInternet(this);
         }
     }
 
