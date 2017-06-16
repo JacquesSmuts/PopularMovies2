@@ -323,7 +323,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 final ArrayList<Trailer> trailers = Trailer.listFromJson(response);
                 //mTrailerListAdapter.addData(trailers);
                 movie.setTrailers(trailers);
-                handleServerSuccess(trailers != null && trailers.size() > 0);
+                handleServerSuccess(trailers != null);
             }
         });
     }
@@ -338,7 +338,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LoaderMana
                 final ArrayList<Review> reviews = Review.listFromJson(response);
                 movie.setReviews(reviews);
                 //mTrailerListAdapter.addData(trailers);
-                handleServerSuccess(reviews != null && reviews.size() > 0);
+                handleServerSuccess(reviews != null);
             }
         });
     }
