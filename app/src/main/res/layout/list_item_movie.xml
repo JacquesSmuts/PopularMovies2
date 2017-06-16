@@ -10,8 +10,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/selector_movie_background"
-        android:minHeight="100dp"
-        android:minWidth="100dp"
+        android:minHeight="@dimen/min_size_large"
+        android:minWidth="@dimen/min_size_large"
         android:padding="@dimen/grid_layout_padding"
         android:scaleType="fitCenter" />
 

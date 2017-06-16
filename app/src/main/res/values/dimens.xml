@@ -3,5 +3,13 @@
     <dimen name="grid_layout_margin">4dp</dimen>
     <dimen name="grid_layout_padding">2dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="loading_indicator_size">42dp</dimen>
+    <dimen name="margin_largish">16dp</dimen>
+    <dimen name="margin_medium">8dp</dimen>
+    <dimen name="margin_large">20dp</dimen>
+    <dimen name="margin_small">4dp</dimen>
+    <dimen name="min_size_large">100dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="margin_smallish">6dp</dimen>
 
 </resources>

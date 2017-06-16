@@ -21,8 +21,8 @@ tools:context="com.jacquessmuts.popularmovies.Activities.HomeActivity">
 
     <ProgressBar
         android:id="@+id/pb_loading_indicator"
-        android:layout_height="42dp"
-        android:layout_width="42dp"
+        android:layout_height="@dimen/loading_indicator_size"
+        android:layout_width="@dimen/loading_indicator_size"
         android:layout_gravity="center"
         android:visibility="invisible" />
 
