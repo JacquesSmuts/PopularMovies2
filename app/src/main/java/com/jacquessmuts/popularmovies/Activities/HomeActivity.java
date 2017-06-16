@@ -17,9 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.jacquessmuts.popularmovies.Adapters.MovieListAdapter;
 import com.jacquessmuts.popularmovies.Data.MovieContract;
 import com.jacquessmuts.popularmovies.Models.Movie;
@@ -31,8 +29,12 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import icepick.Icepick;
+import icepick.State;
 
 public class HomeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, MovieListAdapter.MovieListOnClickHandler, SwipeRefreshLayout.OnRefreshListener {
+
+    public static final String KEY_LAYOUT_INSTANCE_STATE = "key_layout_instance_state";
 
     @BindView(R.id.swiperefresh_home) SwipeRefreshLayout swiperefresh_home;
     @BindView(R.id.recyclerview_home) RecyclerView recyclerview_home;
@@ -42,7 +44,9 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @BindView(R.id.pb_loading_indicator) ProgressBar pb_loading_indicator;
 
-    private Server.SortingOption sortingOption;
+    @State Server.SortingOption sortingOption;
+    @State ArrayList<Movie> movieList;
+    @State int scrollPosition;
     private Cursor cursor;
 
     /*
@@ -75,19 +79,33 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        sortingOption = Server.SortingOption.POPULAR;
+        Icepick.restoreInstanceState(this, savedInstanceState);
         ButterKnife.bind(this);
         setupRecyclerView();
-
         getSupportLoaderManager().initLoader(ID_MOVIE_LOADER, null, this);
 
-        sortingOption = Server.SortingOption.POPULAR;
-        onRefresh();
+        if (savedInstanceState == null){
+            onRefresh();
+        } else {
+            movieListAdapter.setData(movieList);
+            layoutManager.scrollToPosition(scrollPosition);
+        }
     }
 
     @Override
     public void onRefresh() {
         setLoading(true);
         getData(1);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_LAYOUT_INSTANCE_STATE, layoutManager.onSaveInstanceState());
+        movieList = movieListAdapter.getMovieList();
+        scrollPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+        Icepick.saveInstanceState(this, outState);
     }
 
     @Override
@@ -130,6 +148,7 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
         if (Util.isTablet(this)){
             columns = columns+1;
         }
+
         layoutManager = new GridLayoutManager(this, columns);
         recyclerview_home.setLayoutManager(layoutManager);
 
@@ -253,7 +272,6 @@ public class HomeActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         cursor = data;
-        onRefresh();
     }
 
     @Override

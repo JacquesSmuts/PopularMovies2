@@ -31,6 +31,9 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
         void onClick(Movie movieObject);
     }
 
+    public ArrayList<Movie> getMovieList() {
+        return movieList;
+    }
 
     public MovieListAdapter(MovieListOnClickHandler clickHandler) {
         this.clickHandler = clickHandler;
